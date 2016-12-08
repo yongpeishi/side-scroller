@@ -1,2 +1,12 @@
 /* some style */
 
+.roller {
+  border: 1px solid blue;
+  position: absolute;
+  background: transparent url(../imgs/roller-base.png) no-repeat top left;
+  top: 312px;
+  left: 100px;
+  width: 30px;
+  height: 30px;
+}
+
