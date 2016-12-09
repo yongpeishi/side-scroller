@@ -26,9 +26,10 @@
 
 (defn update-roller []
   (swap! app-state (fn [{:keys [roller-y]}]
-                     (if (<= roller-y 100)
-                       {:roller-y 100}
-                       {:roller-y (- roller-y 10)}))))
+                     {:roller-y
+                      (if (<= roller-y 100)
+                        100
+                        (- roller-y 10))})))
 
 (defn time-loop [timestamp]
   (update-roller)
@@ -41,6 +42,5 @@
           (do
            (println "enter pressed")
            (.requestAnimationFrame js/window time-loop))
-          ;;(update-roller)
           (println "no"))))
 
