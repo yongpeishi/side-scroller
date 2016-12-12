@@ -8,7 +8,8 @@
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state
-  (atom {:roller-y 312}))
+  (atom {:roller-y 312
+         :jump-started 0}))
 
 (defn game-world []
   (let [{:keys [roller-y]} @app-state]
@@ -24,23 +25,36 @@
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
 
-(defn update-roller []
-  (swap! app-state (fn [{:keys [roller-y]}]
-                     {:roller-y
-                      (if (<= roller-y 100)
-                        100
-                        (- roller-y 10))})))
+(defn calculate-x [time-start]
+  (let [interval 500 time-current (.now js/Date)]
+    (if (= time-start time-current)
+      0
+      (do
+        (/ (- time-current time-start) interval)))))
 
-(defn time-loop [timestamp]
-  (update-roller)
-  (.requestAnimationFrame js/window time-loop)
-  )
+(defn calculate-jump-position [x]
+  (* 100 (+ 2 (.sin js/Math x))))
+
+(defn update-roller-y [jump-started]
+  (calculate-jump-position (calculate-x jump-started)))
+
+(defn update-state [{:keys [jump-started]}]
+  {:roller-y (update-roller-y jump-started)
+   :jump-started jump-started})
+
+(defn update-game []
+  (swap! app-state update-state))
+
+(defn time-loop []
+  (update-game)
+  (.requestAnimationFrame js/window time-loop))
 
 (aset js/document "onkeypress"
       (fn [e]
         (if (= 32 (aget e "charCode"))
           (do
-           (println "enter pressed")
-           (.requestAnimationFrame js/window time-loop))
+            (println "enter pressed")
+            (swap! app-state assoc :jump-started (.now js/Date))
+            (.requestAnimationFrame js/window time-loop))
           (println "no"))))
 
