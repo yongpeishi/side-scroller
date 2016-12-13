@@ -37,16 +37,14 @@
     (- base-position y)))
 
 (defn update-state [{:keys [jump-happening]} n]
+  (println n)
   (let [new-y (calculate-jump-position n)]
     (if (>= new-y base-position)
       {:roller-y base-position :jump-happening false}
       {:roller-y new-y :jump-happening true})))
 
-(defn update-game [n]
-  (swap! app-state update-state n))
-
 (defn time-loop [n]
-  (update-game n)
+  (swap! app-state update-state n)
   (if (< n jump-speed)
     (.requestAnimationFrame js/window (partial time-loop (inc n)))))
 
@@ -55,7 +53,7 @@
         (if (= 32 (aget e "charCode"))
           (do
             (println "enter pressed")
-            (swap! app-state assoc :jump-happening true)
-            (.requestAnimationFrame js/window (partial time-loop 0)))
+            (if-not (get @app-state :jump-happening)
+              (.requestAnimationFrame js/window (partial time-loop 0))))
           (println "no"))))
 
