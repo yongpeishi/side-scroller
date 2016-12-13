@@ -8,13 +8,14 @@
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state
-  (atom {:roller-y 312
-         :jump-started 0}))
+  (atom {:roller-y 285
+         :jump-start-time 0
+         :jump-happening false}))
 
 (defn game-world []
   (let [{:keys [roller-y]} @app-state]
-    [:div
-     [:div.roller {:style {:top (str roller-y "px")} }]]))
+    [:div.content
+     [:div.roller {:style {:top (str roller-y "px")}}]]))
 
 (reagent/render-component [game-world]
                           (. js/document (getElementById "app")))

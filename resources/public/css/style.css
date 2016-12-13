@@ -4,9 +4,15 @@
   border: 1px solid blue;
   position: absolute;
   background: transparent url(../imgs/roller-base.png) no-repeat top left;
-  top: 312px;
+  top: 285px;
   left: 100px;
   width: 30px;
   height: 30px;
 }
+
+.content {
+  height: 300px;
+  border-bottom: 1px solid red;
+}
+
 
