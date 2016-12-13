@@ -7,8 +7,12 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
+(def ^:const jump-height 150)
+(def ^:const jump-speed 60)
+(def ^:const base-position 285)
+
 (defonce app-state
-  (atom {:roller-y 285
+  (atom {:roller-y base-position
          :jump-start-time 0
          :jump-happening false}))
 
@@ -27,17 +31,16 @@
 )
 
 (defn calculate-sin-y [x]
-  ;; mulitple by how high the jump is
-  (* 150 (.sin js/Math (* x (aget js/Math "PI")))))
+  (* jump-height (.sin js/Math (* x (aget js/Math "PI")))))
 
 (defn calculate-jump-position [n]
-  (let [y (calculate-sin-y (/ n 60))]
-    (- 285 y)))
+  (let [y (calculate-sin-y (/ n jump-speed))]
+    (- base-position y)))
 
 (defn update-state [{:keys [jump-start-time jump-happening] :as state} n]
   (let [new-y (calculate-jump-position n)]
-    (if (>= new-y 285)
-      {:roller-y 285 :jump-start-time 0 :jump-happening false}
+    (if (>= new-y base-position)
+      {:roller-y base-position :jump-start-time 0 :jump-happening false}
       {:roller-y new-y :jump-start-time jump-start-time :jump-happening true})))
 
 (defn update-game [n]
@@ -45,7 +48,7 @@
 
 (defn time-loop [n]
   (update-game n)
-  (if (< n 60)
+  (if (< n jump-speed)
     (.requestAnimationFrame js/window (partial time-loop (inc n)))))
 
 (aset js/document "onkeypress"
