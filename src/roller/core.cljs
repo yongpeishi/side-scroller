@@ -13,7 +13,6 @@
 
 (defonce app-state
   (atom {:roller-y base-position
-         :jump-start-time 0
          :jump-happening false}))
 
 (defn game-world []
@@ -37,11 +36,11 @@
   (let [y (calculate-sin-y (/ n jump-speed))]
     (- base-position y)))
 
-(defn update-state [{:keys [jump-start-time jump-happening] :as state} n]
+(defn update-state [{:keys [jump-happening]} n]
   (let [new-y (calculate-jump-position n)]
     (if (>= new-y base-position)
-      {:roller-y base-position :jump-start-time 0 :jump-happening false}
-      {:roller-y new-y :jump-start-time jump-start-time :jump-happening true})))
+      {:roller-y base-position :jump-happening false}
+      {:roller-y new-y :jump-happening true})))
 
 (defn update-game [n]
   (swap! app-state update-state n))
@@ -56,7 +55,7 @@
         (if (= 32 (aget e "charCode"))
           (do
             (println "enter pressed")
-            (swap! app-state assoc :jump-start-time (.now js/Date) :jump-happening true)
+            (swap! app-state assoc :jump-happening true)
             (.requestAnimationFrame js/window (partial time-loop 0)))
           (println "no"))))
 
