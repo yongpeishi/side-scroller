@@ -26,36 +26,34 @@
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
 
-(defn calculate-x [time-start]
-  (let [interval 500 time-current (.now js/Date)]
-    (if (= time-start time-current)
-      0
-      (do
-        (/ (- time-current time-start) interval)))))
+(defn calculate-sin-y [x]
+  ;; mulitple by how high the jump is
+  (* 150 (.sin js/Math (* x (aget js/Math "PI")))))
 
-(defn calculate-jump-position [x]
-  (* 100 (+ 2 (.sin js/Math x))))
+(defn calculate-jump-position [n]
+  (let [y (calculate-sin-y (/ n 60))]
+    (- 285 y)))
 
-(defn update-roller-y [jump-started]
-  (calculate-jump-position (calculate-x jump-started)))
+(defn update-state [{:keys [jump-start-time jump-happening] :as state} n]
+  (let [new-y (calculate-jump-position n)]
+    (if (>= new-y 285)
+      {:roller-y 285 :jump-start-time 0 :jump-happening false}
+      {:roller-y new-y :jump-start-time jump-start-time :jump-happening true})))
 
-(defn update-state [{:keys [jump-started]}]
-  {:roller-y (update-roller-y jump-started)
-   :jump-started jump-started})
+(defn update-game [n]
+  (swap! app-state update-state n))
 
-(defn update-game []
-  (swap! app-state update-state))
-
-(defn time-loop []
-  (update-game)
-  (.requestAnimationFrame js/window time-loop))
+(defn time-loop [n]
+  (update-game n)
+  (if (< n 60)
+    (.requestAnimationFrame js/window (partial time-loop (inc n)))))
 
 (aset js/document "onkeypress"
       (fn [e]
         (if (= 32 (aget e "charCode"))
           (do
             (println "enter pressed")
-            (swap! app-state assoc :jump-started (.now js/Date))
-            (.requestAnimationFrame js/window time-loop))
+            (swap! app-state assoc :jump-start-time (.now js/Date) :jump-happening true)
+            (.requestAnimationFrame js/window (partial time-loop 0)))
           (println "no"))))
 
