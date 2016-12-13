@@ -1,7 +1,6 @@
 /* some style */
 
 .roller {
-  border: 1px solid blue;
   position: absolute;
   background: transparent url(../imgs/roller-base.png) no-repeat top left;
   top: 285px;
@@ -12,7 +11,7 @@
 
 .content {
   height: 300px;
-  border-bottom: 1px solid red;
+  border-bottom: 1px solid brown;
 }
 
 
