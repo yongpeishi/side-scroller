@@ -23,21 +23,14 @@
 (reagent/render-component [game-world]
                           (. js/document (getElementById "app")))
 
-(defn on-js-reload []
-  ;; optionally touch your app-state to force rerendering depending on
-  ;; your application
-  ;; (swap! app-state update-in [:__figwheel_counter] inc)
-)
-
-(defn calculate-sin-y [x]
-  (* jump-height (.sin js/Math (* x (aget js/Math "PI")))))
+(defn sine-y-value [n]
+  (let [x (* (/ n jump-speed) (aget js/Math "PI"))]
+    (* jump-height (.sin js/Math x))))
 
 (defn calculate-jump-position [n]
-  (let [y (calculate-sin-y (/ n jump-speed))]
-    (- base-position y)))
+  (- base-position (sine-y-value n)))
 
-(defn update-state [{:keys [jump-happening]} n]
-  (println n)
+(defn update-state [_ n]
   (let [new-y (calculate-jump-position n)]
     (if (>= new-y base-position)
       {:roller-y base-position :jump-happening false}
